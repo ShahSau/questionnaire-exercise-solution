@@ -1,0 +1,77 @@
+{
+  "id": "patient-intake-v1",
+  "title": "Patient Health Intake",
+  "questions": [
+    {
+      "id": "q_name",
+      "order": 10,
+      "type": "text",
+      "text": "What is your full name?",
+      "validation": { "required": true, "maxLength": 100, "pattern": "^[a-zA-Z ]+$" }
+    },
+    {
+      "id": "q_has_symptoms",
+      "order": 20,
+      "type": "confirm",
+      "text": "Are you currently experiencing any symptoms?",
+      "validation": { "required": true }
+    },
+    {
+      "id": "q_symptom_list",
+      "order": 30,
+      "type": "multiselect",
+      "text": "Which symptoms are you experiencing? Select all that apply.",
+      "options": ["Headache", "Fever", "Cough", "Nausea", "Other"],
+      "condition": { "questionId": "q_has_symptoms", "operator": "equals", "answer": true },
+      "validation": { "required": true }
+    },
+    {
+      "id": "q_symptom_type",
+      "order": 40,
+      "type": "select",
+      "text": "Which symptom is most prominent?",
+      "options": ["Headache", "Fever", "Cough", "Nausea", "Other"],
+      "condition": { "questionId": "q_has_symptoms", "operator": "equals", "answer": true },
+      "validation": { "required": true }
+    },
+    {
+      "id": "q_other_symptom",
+      "order": 50,
+      "type": "text",
+      "text": "Please briefly describe your other symptom.",
+      "condition": { "questionId": "q_symptom_type", "operator": "equals", "answer": "Other" },
+      "validation": { "required": true, "maxLength": 150 }
+    },
+    {
+      "id": "q_pain_level",
+      "order": 60,
+      "type": "select",
+      "text": "How would you rate your current pain level?",
+      "options": ["None", "Mild", "Moderate", "Severe"],
+      "condition": { "questionId": "q_has_symptoms", "operator": "equals", "answer": true },
+      "validation": { "required": true }
+    },
+    {
+      "id": "q_pain_details",
+      "order": 65,
+      "type": "text",
+      "text": "Please describe the severe pain you are experiencing.",
+      "condition": { "questionId": "q_pain_level", "operator": "equals", "answer": "Severe" },
+      "validation": { "required": true, "maxLength": 300 }
+    },
+    {
+      "id": "q_age",
+      "order": 70,
+      "type": "number",
+      "text": "How old are you?",
+      "validation": { "required": true, "min": 0, "max": 120 }
+    },
+    {
+      "id": "q_consent",
+      "order": 80,
+      "type": "confirm",
+      "text": "Do you consent to storing these answers in your medical record?",
+      "validation": { "required": true }
+    }
+  ]
+}
