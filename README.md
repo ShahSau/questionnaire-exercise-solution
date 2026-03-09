@@ -1,66 +1,50 @@
 # Heartbeat Engineering Exercise
 
-> 🚨 Please fork the repository and complete the exercise in your forked **private** repository.
-> Once completed, please create a PR _within your private repo_ and invite us to your repository.
+A CLI questionnaire engine built in TypeScript. It loads a question set from a JSON file, walks the user through each question in order, handles conditional branching, and prints a summary at the end. The process is cyclic: after each session, it asks if you want to run another one so you don't have to restart the app.
 
-Thank you for your interest in Heartbeat! We are excited to see your skills in action through this engineering exercise.
-This exercise is designed to assess your coding skills, problem-solving abilities, and understanding of software development
-best practices. Please read the instructions carefully and complete the tasks as specified.
+---
 
-## Overview
+## Getting Started
 
-This repository contains a simple node CLI application. It includes a few basic commands and a simple file structure.
+You'll need Node.js version 22.
 
+```bash
+npm install
 ```
-├── src/
-│   ├── engine.ts
-│   ├── logger.ts
-│   └── main.ts
-├── tests/
-│   └── engine.test.ts
-```
+---
 
-The general structure of the files doesn't need to be changed, but feel free to add any additional files
-or folders as needed.
+## Running the App
 
-## Task
+| Command | Description |
+|---|---|
+| `npm run preview` | Builds once and runs natively.|
+| `npm run dev` | Builds and runs with a watcher.|
+| `npm run typecheck` | Runs tsc without emitting.|
+| `npm run lint` | Runs ESLint across the whole project.|
+| `npm run test` | Runs the entire test suite once.|
 
-Build a CLI-based Questionnaire engine that prompts users with a series of questions and records their answers.
-A questionnaire session should be completed with a summary of the user's responses.
+---
 
-### Requirements
+## Design Decisions
 
-- The application question-set should be configurable with configuration file (e.g., JSON or YAML).
-- Questions should be sequentially presented to the user.
-- Questions can be conditionally shown based on previous answers. (for example, Do you have a pet? If yes, ask what kind of pet)
-- The program should be cyclic. (i.e., after completing a questionnaire, the user should be able to start a new one without restarting the application).
-- Document your chosen architecture and design decisions.
-- Errors should, of course, be handled gracefully.
+### Why `@inquirer/prompts`
+The reason is that Node's native `readline` module only gives raw line input. It has no concept of arrow key navigation, multiselect toggling, or re-prompting on invalid input. For `text` and `confirm` questions, `readline` would have been fine. But since we are also using `select` and `multiselect`, i opt to choose `@inquirer/prompts`.
 
-### Bonus Points
+### Input Validation
+The engine decides which questions to ask. The prompter validates how they are answered. Validation rules are defined per question in `questionnaire.json` and enforced in `prompter.ts`.
 
-- Questions can have different types and corresponding validation (e.g., multiple-choice, text input, yes/no).
-- Include unit tests for your code.
+**`text`** — checks `required` (empty/whitespace), `maxLength`, and optionally a `pattern` regex. Inquirer's `validate` callback handles re-prompting automatically when these fail.
 
-## Submission
+**`number`** — checks `required`, `min`, and `max`. Inquirer's `number()` natively rejects non-numeric input before our validator even runs.
 
-### Time
+**`confirm`** — no validation needed. Inquirer only accepts yes/no, so invalid input is impossible by design.
 
-> We expect you to spend no more than 4 hours on this exercise. Please prioritize quality over quantity. If you can't complete all tasks/requirements, let us know in your submission how you would extend it.
+**`select`** — no validation needed. The user can only pick from a predefined list, so Inquirer makes invalid input structurally impossible.
 
-### External assistance
+**`multiselect`** — checks `required` (at least one selection). Because `@inquirer/prompts` returns `readonly string[]` from `checkbox()`, the `validate` callback has a type clash, so the required check runs after the prompt resolves rather than inside it.
 
-- You may use external utility libraries if it helps you speed things up. Do share your reasoning if you decide to share something uncommon.
-- We expect you to write the core logic yourself. You can use internet search or LLMs to clarify concepts or get unstuck, but please do not get the AI to write the code for you.
-  As it is obvious, it defeats the purpose of the exercise and would disqualify your submission.
+### process.exit(0) on goodbye
+Without it, `@inquirer/prompts` keeps the readline interface open and the terminal freezes after the last prompt. For a CLI tool, this is an explicit exit.
 
-### Process
-
-1. Create a private fork of this repository
-2. Create a new branch in your fork
-3. Commit on that branch
-4. When you are ready to submit, create a PR within your fork
-5. Invite [@nuelsoft](https://github.com/nuelsoft) and [@usamasulaiman](https://github.com/usamasulaiman) to your private repo
-6. We will comment on the PR
-7. You can either submit more code or we can discuss in the next interview
-8. Any questions, reach out to us!
+### AnswerMap as Map<id, Answer> and equals and includes operator
+An absent key in `AnswerMap` explicitly means the question condition was not met and was skipped.  `equals` handles scalar types. `includes` handles multiselect arrays. 
