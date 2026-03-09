@@ -36,16 +36,6 @@ export class CliPrompter implements Prompter {
           choices: question.options.map((opt) => ({ value: opt })),
         });
 
-      //   case "multiselect": {
-      //     const result = await checkbox({
-      //       message: question.text,
-      //       choices: question.options.map((opt) => ({ value: opt })),
-      //     });
-      //     if (question.validation?.required && result.length === 0) {
-      //       throw new Error("Please select at least one option.");
-      //     }
-      //     return result as string[];
-      //   }
       case "multiselect": {
         const result = await checkbox({
           message: question.text,
@@ -54,7 +44,7 @@ export class CliPrompter implements Prompter {
         const validation = validateMultiSelect([...result], question);
         if (validation !== true) {
           // checkbox has no re-prompt mechanism outside validate,
-          // so we surface it as an error to main.ts
+          // so surfacing it as an error to main.ts
           throw new Error(validation);
         }
         return [...result] as string[];

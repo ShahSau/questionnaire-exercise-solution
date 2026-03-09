@@ -71,9 +71,10 @@ export class QuestionnaireEngine {
         question.condition &&
         !this.evaluateCondition(question.condition, answers)
       ) {
-        sessionLogger.info(
-          `Skipping question "${question.id}" — condition not met`,
-        );
+        // Condition not met, skip this question
+        // sessionLogger.info(
+        //   `Skipping question "${question.id}" — condition not met`,
+        // );
         continue;
       }
 
