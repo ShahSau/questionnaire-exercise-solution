@@ -1,9 +1,12 @@
-export type ConditionOperator = "equals" | "includes"
+export type ConditionOperator = "equals" | "includes";
 
 export type Condition =
-  | { questionId: string; operator: "equals"; answer: string | boolean | number }
+  | {
+      questionId: string;
+      operator: "equals";
+      answer: string | boolean | number;
+    }
   | { questionId: string; operator: "includes"; answer: string };
-
 
 export type BaseValidation = {
   required?: boolean;

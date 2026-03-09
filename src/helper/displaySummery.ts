@@ -1,6 +1,6 @@
 import { SessionResult } from "../types";
 
-export function displaySummary(result: SessionResult | any): void {
+export function displaySummary(result: SessionResult): void {
   const rows = result.json();
   const divider = "─".repeat(60);
 

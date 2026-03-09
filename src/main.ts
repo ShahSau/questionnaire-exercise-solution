@@ -3,6 +3,8 @@ import { QuestionnaireEngineFactory } from "./engine";
 import { confirm } from "@inquirer/prompts";
 import { loadConfig } from "./helper/loadConfig";
 import { displaySummary } from "./helper/displaySummery";
+import { CliPrompter } from "./prompter";
+
 const logger = createLogger("main");
 
 async function start() {
@@ -13,8 +15,11 @@ async function start() {
     `Loaded config: "${config.title}" (${config.questions.length} questions)`,
   );
 
-  const engine = QuestionnaireEngineFactory.mockEngine(
-    createLogger("MockEngine"),
+  const prompter = new CliPrompter();
+  const engine = QuestionnaireEngineFactory.create(
+    config,
+    prompter,
+    createLogger("engine"),
   );
 
   while (true) {
